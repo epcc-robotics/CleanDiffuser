@@ -65,6 +65,7 @@ class ChiUNet1d(BaseNNDiffusion):
         self.obs_as_global_cond = obs_as_global_cond
         self.model_dim = model_dim
         self.emb_dim = emb_dim
+        self.n_down = len(dim_mult) - 1
 
         dims = [act_dim] + [model_dim * m for m in np.cumprod(dim_mult)]
 
@@ -137,7 +138,7 @@ class ChiUNet1d(BaseNNDiffusion):
             y:          (b, Ta, act_dim)
         """
         # check Ta dimension
-        assert x.shape[1] & (x.shape[1] - 1) == 0, "Ta dimension must be 2^n"
+        assert x.shape[1] % (2 ** self.n_down) == 0, f"Ta must be divisible by {2 ** self.n_down}"
 
         x = x.permute(0, 2, 1)
 
